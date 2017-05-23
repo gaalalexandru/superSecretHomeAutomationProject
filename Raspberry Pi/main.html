@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+
+<script
+ src="https://code.jquery.com/jquery-3.2.1.min.js"
+ integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+ crossorigin="anonymous"></script>
+
+
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+		<link rel="stylesheet" href="/style.css">
+		<style>
+
+			#danger { 
+			  visibility: hidden;
+			}
+           #succes {
+              visibility: hidden;
+            }
+	 /* Style for table */
+
+			table, th, td {
+				border: 1px solid blue;
+				align: right;
+			}
+			.pink-color {
+				color: pink;
+			}
+	 /* End style for table */
+
+     /* Style for switch button */
+
+			.switch {
+			  position: relative;
+			  display: inline-block;
+			  width: 60px;
+			  height: 34px;
+			}
+
+			.switch input {display:none;}
+
+			.slider {
+			  position: absolute;
+			  cursor: pointer;
+			  top: 0;
+			  left: 0;
+			  right: 0; Form for LED control
+	<h2>LED PWM control</h2>
+	<div>
+		<label>LED PWM (0-100)</label>
+		<input type="text" name="ledPower" id="ledPower" placeholder="0-100"> 
+	</div>
+	<button id="setPower">Set Power</button>
+End for LED control 
+			  bottom: 0;
+			  background-color: #ccc;
+			  -webkit-transition: .4s;
+			  transition: .4s;
+			}
+
+			.slider:before {
+			  position: absolute;
+			  content: "";
+			  height: 26px;
+			  width: 26px;
+			  left: 4px;
+			  bottom: 4px;
+			  background-color: white;
+			  -webkit-transition: .4s;
+			  transition: .4s;
+			}
+
+			input:checked + .slider {
+			  background-color: #7FFF00;
+			}
+
+			input:focus + .slider {
+			  box-shadow: 0 0 1px #2196F3;
+			}
+
+			input:checked + .slider:before {
+			  -webkit-transform: translateX(26px);
+			  -ms-transform: translateX(26px);
+			  transform: translateX(26px);
+			}
+	/* End style for switch button */
+
+
+		</style>
+	</head>
+
+<!---HTML design section--->
+<body class="w3-content" style="max-width:1600px">
+
+<!-- Home button-->
+<div id="menu" align="left"  >
+	<a href="http://0.0.0.0:8080">Home</a>
+</div>
+<!--End Home button-->
+
+<div class="w3-row">
+	<!------------------------------------------>
+	<!---                                    --->
+	<!--- GRID 1 for Heating and Ventilation --->
+	<!---                                    --->
+	<!------------------------------------------>
+	<div class="w3-half w3-black w3-container" style="min-height:520px">
+		<!---1st raw with header and status--->   		
+		<div class="w3-row">
+			<div class="w3-col m6 l6">
+				<h5 class="w3-center ">Heating & Ventilation</h5>
+			</div>
+			<!---Form for Temperature & Humidity  --->
+			<div class="w3-col m6 l6">
+				<table>
+					<tr>
+				 		<div class="table, th, td " align="right" >
+							<th>Server monitoring</th>
+						</div>
+				  	</tr>
+					<tr>
+						<div>
+							<th>Temperature<th>
+							<td><input type="text" name="temperature" id="temperature" size=2> °C</td>
+						</div>
+					</tr>
+					<tr>
+						<div>
+							<th>Humidity<th>
+							<td><input type="text" name="humidity" id="humidity" size=2> % </td>
+						</div>
+					</tr>
+				</table>
+			</div>
+		</div>
+		<br/>
+		<br/>
+		<!---2nd raw with heating header--->   		
+		<!--- Forms for setting and monitoring temperature -->	
+		<div class="w3-row"> <!---1st sub row--->  
+			<div class="w3-col m4 l4"> 
+				<h5>Heating:</h5>
+			</div>
+			<div class="w3-col m4 l4">
+				<h5>Monitoring</h5>
+			</div>
+			<div class="w3-col m4 l4">
+				<h5>Control</h5>
+			</div>
+		</div>
+		<div class="w3-row"> <!---2nd sub row--->  
+			<div class="w3-col m4 l4">
+				<label>Kitchen (T1): </label>
+			</div>
+			<div class="w3-col m4 l4">
+				<!--- Form for kitchen temperature monitoring --->
+				<input type="text" name="t1Monitor" id="t1Monitor" size="5" value=""> °C
+			</div>		
+			<div class="w3-col m4 l4">
+				<!--- Form for kitchen temperature setting --->
+				<input type="text" name="t1Control" id="t1Control" placeholder="0-40" size="5" value=""> °C
+				<button id="setT1">Set T1</button>
+			</div>
+		</div>
+		<br/>
+		<div class="w3-row"> <!---3nd sub row--->  
+			<div class="w3-col m4 l4">
+				<label>Bedroom (T2): </label>
+			</div>
+			<div class="w3-col m4 l4">
+				<!--- Form for bedroom temperature monitoring --->
+				<input type="text" name="t2Monitor" id="t2Monitor" size="5" value=""> °C
+			</div>
+			<div class="w3-col m4 l4">
+				<!--- Form for bedroom temperature setting --->
+				<input type="text" name="t2Control" id="t2Control" placeholder="0-40" size="5" value=""> °C
+				<button id="setT2">Set T2</button>
+			</div>
+		</div>
+		<br/>
+		<div class="w3-row"> <!---4th sub row--->  
+			<div class="w3-col m4 l4">
+				<label>Bathroom (T3): </label>
+			</div>
+			<div class="w3-col m4 l4">
+				<!--- Form for bathroom temperature monitoring --->
+				<input type="text" name="t3Monitor" id="t3Monitor" size="5" value=""> °C
+			</div>
+			<div class="w3-col m4 l4">
+				<!--- Form for bathroom temperature setting --->
+				<input type="text" name="t3Control" id="t3Control" placeholder="0-40" size="5" value=""> °C
+				<button id="setT3">Set T3</button>
+			</div>
+		</div>
+		<!---END Forms for setting and monitoring temperature -->
+		<br/>
+		<br/>
+		<!---3rd raw with ventilation header--->   		
+		<!--- Forms for setting ventilation power -->
+		<div class="w3-row"> <!---1st sub row--->  
+			<div class="w3-col m6 l6"> 
+				<h5>Ventilation:</h5>
+			</div>
+			<div class="w3-col m6 l6">
+				<h5>Power Setting:</h5>
+			</div>
+		</div>
+		<div class="w3-row"> <!---2nd sub row--->  
+			<div class="w3-col m6 l6"> 
+				<h5>Main ventilation (V1):</h5>
+			</div>
+			<div class="w3-col m6 l6">
+				<input type="range"  name="v1Control" id="v1Control" min="0" max="100" value="50" step="5"/>
+				<button id="setV1">Set V1</button>	
+			</div>
+		</div>
+		<div class="w3-row"> <!---3rd sub row--->  
+			<div class="w3-col m6 l6"> 
+				<h5>Secondary ventilation (V2):</h5>
+			</div>
+			<div class="w3-col m6 l6">
+				<input type="range"  name="v2Control" id="v2Control" min="0" max="100" value="50" step="5"/>
+				<button id="setV2">Set V2</button>	
+			</div>
+		</div>
+		<!---END Forms for setting ventilation power -->
+	</div>
+	<!---END GRID 1 for Heating and Ventilation --->
+
+
+	<!------------------------------------------>
+	<!---                                    --->
+	<!---       GRID 2 for Lightenining      --->
+	<!---                                    --->
+	<!------------------------------------------>
+	<div class="w3-half w3-blue-grey w3-container" style="min-height:520px">
+		<!---1st raw with header--->   		
+		<div class="w3-row">
+			<h5 class="w3-center ">Lightenining</h5>
+		</div>
+		<br/>
+		<!---2nd row with form header--->
+		<div class="w3-row">  <!---1st sub row---> 
+			<div class="w3-col m3 l3"> 
+				<h5></h5>
+			</div>
+			<div class="w3-col m4 l4"> 
+				<h5>Light Intensity</h5>
+			</div>
+			<div class="w3-col m5 l5"> 
+				<h5>Color & Power Setting</h5>
+			</div>
+		</div>
+		<!--- Kitchen lightenining monitoring and control --->
+		<div class="w3-row">  <!---2nd sub row---> 	
+			<div class="w3-col m3 l3"> 
+				<h5>Kitchen (L1):</h5>
+			</div>
+			<div class="w3-col m3 l3"> 
+				<input type="text" name="l1Monitor" id="l1Monitor" size="5" value=""> Lux
+			</div>
+			<div class="w3-col m4 l4">
+				<input type="range"  name="l1Red" id="l1Red" min="0" max="255" value="127" step="5" />
+				<input type="range"  name="l1Green" id="l1Green" min="0" max="255" value="127" step="5" />
+				<input type="range"  name="l1Blue" id="l1Blue" min="0" max="255" value="127" step="5" />
+			</div>
+			<div class="w3-col m2 l2"> 
+				<button id="setL1">Set L1</button>
+			</div>
+		</div>
+		<br/>
+		<!--- Bedroom lightenining monitoring and control --->
+		<div class="w3-row">  <!---3rd sub row--->
+			<div class="w3-col m3 l3"> 
+				<h5>Bedroom (L2):</h5>
+			</div>
+			<div class="w3-col m3 l3"> 
+				<input type="text" name="l2Monitor" id="l2Monitor" size="5" value=""> Lux
+			</div>
+			<div class="w3-col m4 l4"> 
+				<input type="range"  name="l2Red" id="l2Red" min="0" max="255" value="127" step="5" />
+				<input type="range"  name="l2Green" id="l2Green" min="0" max="255" value="127" step="5" />
+				<input type="range"  name="l2Blue" id="l2Blue" min="0" max="255" value="127" step="5" />
+			</div>
+			<div class="w3-col m2 l2"> 
+				<button id="setL2">Set L2</button>
+			</div>
+		</div>
+		<br/>
+		<!--- Bathroom lightenining monitoring and control --->
+		<div class="w3-row">  <!---4th sub row---> 
+			<div class="w3-col m3 l3"> 
+				<h5>Bathroom (L3):</h5>
+			</div>
+			<div class="w3-col m3 l3"> 
+				<input type="text" name="l3Monitor" id="l3Monitor" size="5" value=""> Lux
+			</div>
+			<div class="w3-col m4 l4"> 
+				<input type="range"  name="l3Red" id="l3Red" min="0" max="255" value="127" step="5" />
+				<input type="range"  name="l3Green" id="l3Green" min="0" max="255" value="127" step="5" />
+				<input type="range"  name="l3Blue" id="l3Blue" min="0" max="255" value="127" step="5" />
+			</div>
+			<div class="w3-col m2 l2"> 
+				<button id="setL3">Set L3</button>
+			</div>
+		</div>
+	</div>
+	<!---END GRID 2 for Lightenining --->
+</div> <!---END of ROW 1 with GRID 1 and 2 --->
+
+<div class="w3-row">
+
+	<!------------------------------------------>
+	<!---                                    --->
+	<!--- GRID 3 for Security System features--->
+	<!---                                    --->
+	<!------------------------------------------>
+	<div class="w3-col w3-grey w3-center m4 l4" style="min-height:320px" > 
+		<div class="w3-padding-10">
+			<h5>Security</h5>
+		</div>
+		<div class="w3-row">  
+			<div class="w3-row w3-hide-small">
+				<div class="w3-col m3 l3">
+					<div class="w3-container" >
+						<h3></h3>
+					</div>
+				</div>
+				<div class="w3-col m6 l6">
+					<div class="w3-container w3-red" id="danger_security">
+						<h3>Danger!</h3>
+					</div>
+				</div>
+				<div class="w3-col m3 l3">
+					<div class="w3-container " >
+						<h3></h3>
+					</div>
+				</div>
+			</div>
+			<div class="w3-half">
+		    <!-- //// --->
+			</div>
+		</div>
+		<div class="w3-row w3-hide-small">
+			<div class="w3-half">
+		   <!-- //// --->
+			</div>
+			<div class="w3-half">
+		   <!-- //// --->
+			</div>
+		</div>
+		<div class="w3-row w3-hide-small">
+				<div class="w3-col m3 l3">
+					<div class="w3-container" >
+						<h3></h3>
+					</div>
+				</div>
+				<div class="w3-col  m6 l6">
+					<div class="w3-container w3-green" id="succes_security">
+						<h3>OK!</h3>
+					</div>
+				</div>
+			<div class="w3-col m3 l3">
+					<div class="w3-container" >
+						<h3></h3>
+					</div>
+			</div>
+
+      		<div class="w3-half">
+			<!-- //// --->
+			</div>
+		</div>
+	<br>
+	</div>
+	<!---END GRID 3 for Security System features --->
+	
+	<!------------------------------------------>
+	<!---                                    --->
+	<!---       GRID 4 for Flood Warning     --->
+	<!---                                    --->
+	<!------------------------------------------>
+	<div class="w3-col w3-indigo w3-container m4 l4"style="min-height:320px"> 
+		<div class="w3-padding-10 w3-center">
+			<h5>Flood</h5>
+        </div>
+		<br/>
+    
+		<!---2nd row with form header--->
+		<div class="w3-row">  <!---1st sub row---> 
+			<div class="w3-row w3-hide-small">
+				<div class="w3-col m3 l3">
+					<div class="w3-container" >
+						<h3></h3>
+					</div>
+				</div>
+				<div class="w3-col m6 l6">
+					<div class="w3-container w3-red" id="danger_flood">
+						<h3>Flood!</h3>
+					</div>
+				</div>
+				<div class="w3-col m3 l3">
+					<div class="w3-container " >
+						<h3></h3>
+					</div>
+				</div>
+			</div>
+			<div class="w3-row w3-hide-small">
+				<div class="w3-col m3 l3">
+					<div class="w3-container" >
+						<h3></h3>
+					</div>
+				</div>
+				<div class="w3-col  m6 l6">
+					<div class="w3-container w3-green" id="succes_flood">
+						<h3>OK!</h3>
+					</div>
+				</div>
+			<div class="w3-col m3 l3">
+					<div class="w3-container" >
+						<h3></h3>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+<!--
+      </div>
+	</div>-->
+	<!---END GRID 4 for Flood monitoring --->
+
+	<!------------------------------------------>
+	<!---                                    --->
+	<!---       GRID 5 for SPI debugging     --->
+	<!---                                    --->
+	<!------------------------------------------>
+		<div class="w3-col w3-cyan w3-container m4 l4"style="min-height:320px"> 
+		<div class="w3-padding-10 w3-center">
+			<h5>Serial Debug</h5>
+		</div>
+		<br/>
+		<div class="w3-row w3-hide-small">
+			Message to send:
+		</div>
+		<div class="w3-row w3-hide-small">
+			<div class="w3-col m4 l4">
+				byte0:
+			</div>
+			<div class="w3-col m4 l4">
+				byte1:
+			</div>
+			<div class="w3-col m4 l4">
+				<h6></h6>
+			</div>
+		</div>
+		<div class="w3-row w3-hide-small">
+			<div class="w3-col m4 l4">
+				<input type="text" name="sendSpiByte0" id="sendSpiByte0" size="5" value="0">
+			</div>
+			<div class="w3-col m4 l4">
+				<input type="text" name="sendSpiByte1" id="sendSpiByte1" size="5" value="0">
+			</div>
+			<div class="w3-col m4 l4">
+				<button id="spiSend">Send</button>
+			</div>
+		</div>
+		<br/>
+		<div class="w3-row w3-hide-small">
+			Received message:
+		</div>
+		<div class="w3-row w3-hide-small">
+			<div class="w3-col m4 l4">
+				byte0:
+			</div>
+			<div class="w3-col m4 l4">
+				byte1:
+			</div>
+			<div class="w3-col m4 l4">
+				CRC:
+			</div>
+		</div>
+		<div class="w3-row w3-hide-small">
+			<div class="w3-col m4 l4">
+				<input type="text" name="receiveSpiByte0" id="receiveSpiByte0" size="5" value="">
+			</div>
+			<div class="w3-col m4 l4">
+				<input type="text" name="receiveSpiByte1" id="receiveSpiByte1" size="5" value="">
+			</div>
+			<div class="w3-col m4 l4">
+				<input type="text" name="receiveSpiCRC" id="receiveSpiCRC" size="5" value="">
+			</div>
+		</div>
+	</div>
+</div>
+<!---END HTML design section--->
+
+<script>
+
+
+
+////////////////////////////////////////////////
+//                                            //
+//   Temperature and Ventilation functions    //
+//                                            //
+////////////////////////////////////////////////
+/* Function for Server Temperature & Humidity Monitoring*/ 
+
+$(document).ready(function(){
+	setInterval(function(){ 
+		$temperature= $( "#temperature" );
+		$humidity= $( "#humidity" );
+
+		var getData = $.ajax({
+			url: "/sensor_DHT11",
+			method: "GET"       		
+			});
+		getData.done( function( dataFromServer ) {
+			console.log("Temperature of server: " + dataFromServer.temperature );
+			console.log("Humidity of server:  " + dataFromServer.humidity );
+		   	$temperature.val( dataFromServer.temperature );
+			$humidity.val( dataFromServer.humidity );
+		});
+		getData.fail( function( dataFromServer ) {
+			console.log("Server temperature ERROR: " + dataFromServer.temperature );
+			console.log("Server humidity ERROR: " + dataFromServer.humidity );
+		});
+	}, 10000);
+});
+
+/*END Function for Server Temperature & Humidity Monitoring*/ 
+
+/* Function for Temperature Monitoring from slave*/ 
+$(document).ready(function(){
+	setInterval(function(){ 
+		$t1Monitor = $("#t1Monitor");
+		$t2Monitor = $("#t2Monitor");
+		$t3Monitor = $("#t3Monitor");
+		//Comment out next lines if you want input field to automatically update after monitor value
+		//$t1Control = $("#t1Control");
+		//$t2Control = $("#t2Control");
+		//$t3Control = $("#t3Control");
+		var getData = $.ajax({
+			url: "/temperature_monitoring",
+			method: "GET"       		
+			});
+		getData.done( function( dataFromServer ) {
+			console.log("T1 temperature: " + dataFromServer.t1Monitor );
+			console.log("T2 temperature: " + dataFromServer.t2Monitor );
+			console.log("T3 temperature: " + dataFromServer.t3Monitor );
+		   	$t1Monitor.val( dataFromServer.t1Monitor );
+		   	$t2Monitor.val( dataFromServer.t2Monitor );
+		   	$t3Monitor.val( dataFromServer.t3Monitor );
+			//Comment out next lines if you want input field to automatically update after monitor value
+			//$t1Control.val( dataFromServer.t1Monitor );
+		   	//$t2Control.val( dataFromServer.t2Monitor );
+		   	//$t3Control.val( dataFromServer.t2Monitor );
+
+
+		});
+		getData.fail( function( dataFromServer ) {
+			console.log("T1 ERROR: " + dataFromServer.t1Monitor );
+			console.log("T2 ERROR: " + dataFromServer.t2Monitor );
+			console.log("T3 ERROR: " + dataFromServer.t3Monitor );
+		});
+	}, 11000);  //10 seconds interval
+});
+/*END Function for Server Temperature & Humidity Monitoring*/ 
+
+/* Function for T1 Temperature Setting */
+$(document).ready(function(){
+	var $button = $("#setT1");
+	$button.click( function() {
+		$t1Control = $( "#t1Control" ).val();
+		console.log("T1 Temperature Setting: " + $t1Control);
+		var dataFromForm = {
+			t1Control: $t1Control
+		};
+		var postData = $.ajax({
+			url: "/t1_temp_control",
+			method: "POST",
+			data: dataFromForm		
+		});
+		postData.done( function( dataFromServer ) {
+			console.log("T1 changed: " + dataFromServer.t1Control + " " + dataFromServer.response );
+		});
+		postData.fail( function( dataFromServer ) {
+			console.log("T1 error: " + dataFromServer.t1Control + " " + dataFromServer.response );
+		});
+	});
+});
+/*END Function for T1 Temperature Setting */
+
+/* Function for T2 Temperature Setting */
+$(document).ready(function(){
+	var $button = $("#setT2");
+	$button.click( function() {
+		$t2Control = $( "#t2Control" ).val();
+		console.log("T2 Temperature Setting: " + $t2Control);
+		var dataFromForm = {
+			t2Control: $t2Control
+		};
+		var postData = $.ajax({
+			url: "/t2_temp_control",
+			method: "POST",
+			data: dataFromForm		
+		});
+		postData.done( function( dataFromServer ) {
+			console.log("T2 changed: " + dataFromServer.t2Control + " " + dataFromServer.response );
+		});
+		postData.fail( function( dataFromServer ) {
+			console.log("T2 error: " + dataFromServer.t2Control + " " + dataFromServer.response );
+		});
+	});
+});
+/*END Function for T2 Temperature Setting */
+
+/* Function for T3 Temperature Setting */
+$(document).ready(function(){
+	var $button = $("#setT3");
+	$button.click( function() {
+		$t3Control = $( "#t3Control" ).val();
+		console.log("T3 Temperature Setting: " + $t3Control);
+		var dataFromForm = {
+			t3Control: $t3Control
+		};
+		var postData = $.ajax({
+			url: "/t3_temp_control",
+			method: "POST",
+			data: dataFromForm		
+		});
+		postData.done( function( dataFromServer ) {
+			console.log("T3 changed: " + dataFromServer.t3Control + " " + dataFromServer.response );
+		});
+		postData.fail( function( dataFromServer ) {
+			console.log("T3 error: " + dataFromServer.t3Control + " " + dataFromServer.response );
+		});
+	});
+});
+/*END Function for T3 Temperature Setting */
+
+/* Function for Main Ventilation Setting*/
+$(document).ready(function(){
+	var $button = $("#setV1");
+	$button.click( function() {
+		$v1Control = $( "#v1Control" ).val();
+		console.log("Main ventilation setting: " + $v1Control);
+		var dataFromForm = {
+			v1Control: $v1Control
+		};
+		var postData = $.ajax({
+			url: "/main_vent_setting",
+			method: "POST",
+			data: dataFromForm		
+		});
+
+		postData.done( function( dataFromServer ) {
+			console.log("Main Ventilation setting changed: " + dataFromServer.v1Control );
+		});
+		postData.fail( function( dataFromServer ) {
+			console.log("Main Ventilation setting error: " + dataFromServer.v1Control );
+		});
+	});
+});
+/*END Function for Main Ventilation Setting*/
+
+/* Function for Secondary Ventilation Setting*/
+$(document).ready(function(){
+	var $button = $("#setV2");
+	$button.click( function() {
+		$v2Control = $( "#v2Control" ).val();
+		console.log("Secondary ventilation setting: " + $v2Control);
+		var dataFromForm = {
+			v2Control: $v2Control
+		};
+		var postData = $.ajax({
+			url: "/secondary_vent_setting",
+			method: "POST",
+			data: dataFromForm		
+		});
+
+		postData.done( function( dataFromServer ) {
+			console.log("Secondary Ventilation setting changed: " + dataFromServer.v2Control );
+		});
+		postData.fail( function( dataFromServer ) {
+			console.log("Secondary Ventilation setting error: " + dataFromServer.v2Control );
+		});
+	});
+});
+/*END Function for Secondary Ventilation Setting*/
+
+////////////////////////////////////////////////
+//                                            //
+//          Lightenining functions            //
+//                                            //
+////////////////////////////////////////////////
+
+/* Function for lightening monitoring from slave */
+$(document).ready(function(){
+	setInterval(function(){ 
+		$l1Monitor= $( "#l1Monitor" );
+		$l2Monitor= $( "#l2Monitor" );
+		$l3Monitor= $( "#l3Monitor" );
+		var getData = $.ajax({
+				url: "/light_monitoring",
+				method: "GET",		
+			});
+		getData.done( function( dataFromServer ) {
+			console.log("L1 intensity: " + dataFromServer.l1Monitor );
+			console.log("L2 intensity: " + dataFromServer.l2Monitor );
+			console.log("L3 intensity: " + dataFromServer.l3Monitor );
+		   	$l1Monitor.val( dataFromServer.l1Monitor );
+		   	$l2Monitor.val( dataFromServer.l2Monitor );
+		   	$l3Monitor.val( dataFromServer.l3Monitor );
+		});
+		getData.fail( function( dataFromServer ) {
+			console.log("L1 ERROR: " + dataFromServer.l1Monitor );
+			console.log("L2 ERROR: " + dataFromServer.l2Monitor );
+			console.log("L3 ERROR: " + dataFromServer.l3Monitor );
+		});
+	}, 13000);
+}); /*END Function for lightening monitoring from slave */
+
+/* Function for L1 Lightening Setting */
+$(document).ready(function(){
+	var $button = $("#setL1");
+	$button.click( function() {
+		$l1Red = $( "#l1Red" ).val();
+		$l1Green = $( "#l1Green" ).val();
+		$l1Blue = $( "#l1Blue" ).val();
+		console.log("L1 Lightening Setting: Red " + $l1Red + " Green " + $l1Green + " Blue " + $l1Blue );
+		var dataFromForm = {
+			l1Red: $l1Red,
+			l1Green: $l1Green,
+			l1Blue: $l1Blue
+		};
+		var postData = $.ajax({
+			url: "/l1_light_control",
+			method: "POST",
+			data: dataFromForm		
+		});
+		postData.done( function( dataFromServer ) {
+			console.log("L1 changed: Red " + $l1Red + " Green " + $l1Green + " Blue " + $l1Blue );
+		});
+		postData.fail( function( dataFromServer ) {
+			console.log("L1 ERROR: Red " + $l1Red + " Green " + $l1Green + " Blue " + $l1Blue );
+		});
+	});
+}); /*END Function for L1 Lightening Setting */
+
+/* Function for L2 Lightening Setting */
+$(document).ready(function(){
+	var $button = $("#setL2");
+	$button.click( function() {
+		$l2Red = $( "#l2Red" ).val();
+		$l2Green = $( "#l2Green" ).val();
+		$l2Blue = $( "#l2Blue" ).val();
+		console.log("L2 Lightening Setting: Red " + $l2Red + " Green " + $l2Green + " Blue " + $l2Blue );
+		var dataFromForm = {
+			l2Red: $l2Red,
+			l2Green: $l2Green,
+			l2Blue: $l2Blue
+		};
+		var postData = $.ajax({
+			url: "/l2_light_control",
+			method: "POST",
+			data: dataFromForm		
+		});
+		postData.done( function( dataFromServer ) {
+			console.log("L2 changed: Red " + $l2Red + " Green " + $l2Green + " Blue " + $l2Blue );
+		});
+		postData.fail( function( dataFromServer ) {
+			console.log("L2 ERROR: Red " + $l2Red + " Green " + $l2Green + " Blue " + $l2Blue );
+		});
+	});
+}); /*END Function for L2 Lightening Setting */
+
+/* Function for L3 Lightening Setting */
+$(document).ready(function(){
+	var $button = $("#setL3");
+	$button.click( function() {
+		$l3Red = $( "#l3Red" ).val();
+		$l3Green = $( "#l3Green" ).val();
+		$l3Blue = $( "#l3Blue" ).val();
+		console.log("L3 Lightening Setting: Red " + $l3Red + " Green " + $l3Green + " Blue " + $l3Blue );
+		var dataFromForm = {
+			l3Red: $l3Red,
+			l3Green: $l3Green,
+			l3Blue: $l3Blue
+		};
+		var postData = $.ajax({
+			url: "/l3_light_control",
+			method: "POST",
+			data: dataFromForm		
+		});
+		postData.done( function( dataFromServer ) {
+			console.log("L3 changed: Red " + $l3Red + " Green " + $l3Green + " Blue " + $l3Blue );
+		});
+		postData.fail( function( dataFromServer ) {
+			console.log("L3 ERROR: Red " + $l3Red + " Green " + $l3Green + " Blue " + $l3Blue );
+		});
+	});
+}); /*END Function for L3 Lightening Setting */
+
+////////////////////////////////////////////////
+//                                            //
+//           Serial Debug functions           //
+//                                            //
+////////////////////////////////////////////////
+
+/* SPI Message Send function*/
+$(document).ready(function(){
+	var $button = $("#spiSend");
+	$button.click( function() {
+		$sendSpiByte0 = $( "#sendSpiByte0" ).val();
+		$sendSpiByte1 = $( "#sendSpiByte1" ).val();
+		/*$receiveSpiByte0 = $( "#receiveSpiByte0" ).val();
+		$receiveSpiByte1 = $( "#receiveSpiByte1" ).val();
+		$receiveSpiCRC = $( "#receiveSpiCRC" ).val();*/
+
+		console.log("Byte 0 to send is: " + $sendSpiByte0);
+		console.log("Byte 1 to send is: " + $sendSpiByte1);
+
+		var dataFromForm = {
+			sendSpiByte0: $sendSpiByte0,
+			sendSpiByte1: $sendSpiByte1
+		};
+
+		var postData = $.ajax({
+			url: "/send_spi_message",
+			method: "POST",
+			data: dataFromForm
+		});
+
+		postData.done( function( dataFromServer ) {
+			console.log("Byte 0 sent: " + dataFromServer.sendSpiByte0);
+			console.log("Byte 1 sent: " + dataFromServer.sendSpiByte1);
+			/*console.log("Byte 0 received: " + dataFromServer.receiveSpiByte0);
+			console.log("Byte 1 received: " + dataFromServer.receiveSpiByte1);
+			console.log("Byte CRC: " + dataFromServer.receiveSpiByteCRC);
+			$receiveSpiByte0.val( dataFromServer.receiveSpiByte0 );
+			$receiveSpiByte1.val( dataFromServer.receiveSpiByte1 );
+			$receiveSpiByteCRC.val( dataFromServer.receiveSpiCRC );*/
+		});
+
+		postData.fail( function( dataFromServer ) {
+			console.log("Byte 0 Error: " + dataFromServer.sendSpiByte0);
+			console.log("Byte 1 Error: " + dataFromServer.sendSpiByte1);
+		});
+	});
+});
+
+
+/* SPI Message Receive function*/
+
+$(document).ready(function(){
+	var $button = $("#spiSend");
+	$button.click( function() {
+		$receiveSpiByte0 = $( "#receiveSpiByte0" );
+		$receiveSpiByte1 = $( "#receiveSpiByte1" );
+		$receiveCRC = $( "#receiveSpiCRC" );
+
+
+		var getData = $.ajax({
+			url: "/receive_spi_message",
+			method: "GET",
+		});
+
+		getData.done( function( dataFromServer ) {
+			console.log("Byte 0 received: " + dataFromServer.receiveSpiByte0);
+			console.log("Byte 1 received: " + dataFromServer.receiveSpiByte1);
+			console.log("Byte CRC: " + dataFromServer.receiveCrc);
+			$receiveSpiByte0.val( dataFromServer.receiveSpiByte0 );
+			$receiveSpiByte1.val( dataFromServer.receiveSpiByte1 );
+			$receiveCRC.val( dataFromServer.receiveCrc );
+		});
+
+		getData.fail( function( dataFromServer ) {
+			console.log("Error " + dataFromServer.receiveSpiByte0);
+			console.log("Error " + dataFromServer.receiveSpiByte1);
+			console.log("Error " + dataFromServer.receiveCrc);
+		});
+	});
+});
+
+
+////////////////////////////////////////////////
+//                                            //
+//   Security functions                       //
+//                                            //
+////////////////////////////////////////////////
+/* Function for Server Security Monitoring*/ 
+
+$(document).ready(function(){
+	setInterval(function(){ 
+	    $s1MonitorD = $("#danger_security");
+        $s1MonitorS = $("#succes_security");
+        $s2MonitorD = $("#danger_flood");
+		$s2MonitorS = $("#succes_flood");
+
+/*
+        var dataFromServerFloodDanger=0;
+        var dataFromServerSecurityDanger=0;
+*/
+		var getData = $.ajax({
+			url: "/security_monitoring",
+			method: "GET"       		
+			});
+		getData.done( function( dataFromServer ) {
+	 
+			var dataFromServerSecurityDanger=dataFromServer.s1MonitorSecurity
+			var dataFromServerFloodDanger=dataFromServer.s2MonitorFlood
+		    console.log("fllod: " + dataFromServerFloodDanger);
+		    if (dataFromServerSecurityDanger){
+              document.getElementById("danger_security").style.visibility='visible';
+              document.getElementById("succes_security").style.visibility='hidden';
+              }
+			  else{
+			  document.getElementById("danger_security").style.visibility='hidden';
+			  document.getElementById("succes_security").style.visibility='visible';
+			}
+			if (dataFromServerFloodDanger){
+              document.getElementById("danger_flood").style.visibility='visible';
+              document.getElementById("succes_flood").style.visibility='hidden';
+              }
+		      else{
+			  document.getElementById("danger_flood").style.visibility='hidden';
+			  document.getElementById("succes_flood").style.visibility='visible';
+            }
+		});
+		getData.fail( function( dataFromServer ) {
+			console.log(" Error S1 of server: " + dataFromServer.s1MonitorSecurity);
+            console.log(" Error S2  of server:  " + dataFromServer.s2MonitorFlood);
+		});
+	}, 2000);
+});
+
+
+</script>
+
+</body>
+</html>
+
+
